@@ -1,0 +1,123 @@
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html, body {
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	background-color: =mainBGColor;
+	color: =mainTextColor;
+	font-family: sans-serif;
+	font-weight: lighter;
+}
+
+header {
+	position: relative;
+	padding-bottom: 75px;
+
+	h1 {
+		position: static;
+		margin: 0px;
+		padding: 0px;
+		font-size: 1px;
+		text-indent: -9999px;
+		color: #000;
+		color: rgba(0,0,0,0);
+		background-color: =headerBGColor;
+		height: 220px;
+	}
+
+	.logo {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background: url(../images/header.svg) 50% -24px no-repeat;
+		top: 0px;
+		left: 0px;
+	}
+
+	.sub-text {
+		display: block;
+		position: absolute;
+		font-size: 1px;
+		text-indent: -9999px;
+		color: #000;
+		color: rgba(0,0,0,0);
+		width: 350px;
+		height: 75px;
+		background: url(../images/header-sub-text.svg) 50% 0px no-repeat;
+		top: 145px;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+}
+
+#content {
+	min-width: 300px;
+	max-width: 700px;
+	margin: 0px auto;
+	padding: 0px 30px;
+	font-size: 22px;
+	line-height: 35px;
+
+	a {
+		text-decoration: none;
+		color: =linkTextColor;
+	}
+
+	em {
+		font-style: normal;
+		font-weight: bold;
+		color: =emphasisTextColor;
+	}
+
+	strong {
+		color: =strongTextColor;
+	}
+}
+
+#content a:hover {
+	text-decoration: underline;
+}
+
+footer {
+	position: relative;
+	width: 100%;
+	height: 420px;
+
+	.left-hand {
+		position: absolute;
+		width: 411px;
+		height: 420px;
+		background: url(../images/footer-left-hand.svg) 50% 100% no-repeat;
+		bottom: 0px;
+		left: 50%;
+		transform: translateX(-610px);
+	}
+
+	.text {
+		position: absolute;
+		width: 685px;
+		height: 332px;
+		font-size: 1px;
+		text-indent: -9999px;
+		color: =mainBGColor;
+		color: rgba(0,0,0,0);
+		background: url(../images/footer-text.svg) 50% 100% no-repeat;
+		bottom: 0px;
+		left: 50%;
+		transform: translate(-230px,-50px);
+	}
+
+	.right-hand {
+		position: absolute;
+		width: 411px;
+		height: 420px;
+		background: url(../images/footer-right-hand.svg) 50% 100% no-repeat;
+		bottom: 0px;
+		left: 50%;
+		transform: translateX(300px);
+	}
+}
