@@ -19,8 +19,6 @@
 		},
 		{
 			"scripts": [
-				"/js/Request.js",
-				"/js/API.js",
 				"/js/Notify.js",
 				"/js/Tmpls.js"
 			],

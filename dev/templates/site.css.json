@@ -1,8 +1,8 @@
 {
-	"headerBGColor": "#24ae94",
+	"headerBGColor": "#e8cf3c",
 	"mainBGColor": "#332b2b",
 	"mainTextColor": "#fff",
-	"linkTextColor": "#24ae94",
-	"emphasisTextColor": "#24ae94",
-	"strongTextColor": "#99c5b4"
+	"linkTextColor": "#51B695",
+	"emphasisTextColor": "#51B695",
+	"strongTextColor": "#e8cf3c"
 }
