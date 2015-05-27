@@ -1,7 +1,7 @@
 {
-	"name": "breakthewebforward.com",
+	"name": "unsucktheweb.com",
 	"version": "1.0.0",
-	"description": "breakthewebforward.com: International Break The Web Forward Day!",
+	"description": "unsucktheweb.com: The Unsucked Web Manifesto",
 	"dependencies": {
 		"asynquence": "~0.6.0-a",
 		"asynquence-contrib": "~0.9.0-a",
@@ -17,12 +17,12 @@
 		"watch": "~0.16.0"
 	},
 	"keywords": [
-		"web standards"
+		"user experience", "design"
 	],
 	"bugs": {
 		"email": "getify@gmail.com"
 	},
-	"homepage": "http://breakthewebforward",
+	"homepage": "http://unsucktheweb.com",
 	"author": "Kyle Simpson <getify@gmail.com>",
 	"license": "MIT"
 }
