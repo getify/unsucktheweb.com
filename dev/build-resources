@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 var	PROD = (process.env.NODE_ENV === "production"),
-	DIR_ROOT = global.DIR_ROOT = __dirname,
 
 	path = require("path"),
 	fs = require("fs"),
@@ -19,6 +18,8 @@ var	PROD = (process.env.NODE_ENV === "production"),
 
 	Tmpls,
 
+	DIR_ROOT = global.DIR_ROOT = __dirname,
+
 	DIR_WEB = path.join(DIR_ROOT,"web"),
 	DIR_WEB_HTML = path.join(DIR_WEB,"html"),
 	DIR_WEB_JS = path.join(DIR_WEB,"js"),
@@ -29,20 +30,18 @@ var	PROD = (process.env.NODE_ENV === "production"),
 	DIR_TEMPLATES_HTML = path.join(DIR_TEMPLATES,"html"),
 	DIR_TEMPLATES_CSS = path.join(DIR_TEMPLATES,"css"),
 	DIR_TEMPLATES_JS = path.join(DIR_TEMPLATES,"js"),
-
-	DIR_CACHE = path.join(DIR_TEMPLATES,"cache"),
+	DIR_TEMPLATES_CACHE = path.join(DIR_TEMPLATES,"cache"),
 
 	FILE_TEMPLATE_BUNDLE_WRAPPER = path.join(DIR_TEMPLATES,"tmpls-wrapper.js"),
-	FILE_TEMPLATE_BUNDLE = path.join(DIR_WEB,"js","Tmpls.js"),
+	FILE_TEMPLATE_BUNDLE = path.join(DIR_WEB_JS,"Tmpls.js"),
 
-	FILE_LOADJS_TEMPLATE = path.join(DIR_TEMPLATES,"js","grips.load.js"),
-
+	FILE_LOADJS_TEMPLATE = path.join(DIR_TEMPLATES_JS,"grips.load.js"),
 	FILE_LOADJS_DATA = path.join(DIR_TEMPLATES,"load.js.json"),
-	FILE_SITECSS_DATA = path.join(DIR_TEMPLATES,"site.css.json"),
+	FILE_LOADJS = path.join(DIR_WEB_JS,"load.js"),
 
-	UMASK = eval("0o007"),
-	DIR_PERMS = eval("0o770"),
-	FILE_PERMS = eval("0o640")
+	UMASK = 7, // 0o007
+	DIR_PERMS = 504, // 0o770
+	FILE_PERMS = 416 // 0o640
 ;
 
 global.grips = grips;
@@ -64,7 +63,7 @@ if (args.watch) {
 			ignoreUnreadableDir: true,
 			ignoreNotPermitted: true
 		},
-		/*handler=*/function(monitor) {
+		/*handler=*/function handler(monitor) {
 			monitor.on("created",updateTemplates);
 			monitor.on("changed",updateTemplates);
 		}
@@ -75,7 +74,7 @@ if (args.watch) {
 			ignoreUnreadableDir: true,
 			ignoreNotPermitted: true
 		},
-		/*handler=*/function(monitor) {
+		/*handler=*/function handler(monitor) {
 			monitor.on("created",updateTemplates);
 			monitor.on("changed",updateTemplates);
 		}
@@ -86,9 +85,9 @@ if (args.watch) {
 			ignoreUnreadableDir: true,
 			ignoreNotPermitted: true,
 			ignoreDirectoryPattern: /cache/,
-			filter: function filter(file) {
-				// only monitor the site.css data file
-				return (file == FILE_SITECSS_DATA);
+			filter: function filter(filepath) {
+				// only monitor CSS template data files
+				return /\.css\.json$/.test(filepath)
 			}
 		},
 		/*handler=*/function handler(monitor) {
@@ -102,13 +101,13 @@ if (args.watch) {
 			ignoreUnreadableDir: true,
 			ignoreNotPermitted: true,
 			ignoreDirectoryPattern: /cache/,
-			filter: function filter(file) {
+			filter: function filter(filepath) {
 				// only monitor the load.js template
 				// and its data file
 				return (
-					file == DIR_TEMPLATES_JS ||
-					file == FILE_LOADJS_TEMPLATE ||
-					file == FILE_LOADJS_DATA
+					filepath == DIR_TEMPLATES_JS ||
+					filepath == FILE_LOADJS_TEMPLATE ||
+					filepath == FILE_LOADJS_DATA
 				);
 			}
 		},
@@ -125,14 +124,14 @@ if (args.watch) {
 				ignoreUnreadableDir: true,
 				ignoreNotPermitted: true,
 				ignoreDirectoryPattern: /external/,
-				filter: function filter(file) {
+				filter: function filter(filepath) {
 					return (
-						/\.js(on)?$/.test(file) &&
-						!/\.min\.js(on)?$/.test(file)
+						/\.js(on)?$/.test(filepath) &&
+						!/\.min\.js(on)?$/.test(filepath)
 					);
 				}
 			},
-			/*handler=*/function(monitor) {
+			/*handler=*/function handler(monitor) {
 				monitor.on("created",minifyJSFile);
 				monitor.on("changed",minifyJSFile);
 			}
@@ -142,11 +141,11 @@ if (args.watch) {
 			/*options=*/{
 				ignoreUnreadableDir: true,
 				ignoreNotPermitted: true,
-				filter: function filter(file) {
-					return /\.js$/.test(file);
+				filter: function filter(filepath) {
+					return /\.js$/.test(filepath);
 				}
 			},
-			/*handler=*/function(monitor) {
+			/*handler=*/function handler(monitor) {
 				monitor.on("created",minifyJSFile);
 				monitor.on("changed",minifyJSFile);
 			}
@@ -156,17 +155,17 @@ if (args.watch) {
 			/*options=*/{
 				ignoreUnreadableDir: true,
 				ignoreNotPermitted: true,
-				filter: function filter(file) {
+				filter: function filter(filepath) {
 					return !(
-						/\.gz$/.test(file) ||
+						/\.gz$/.test(filepath) ||
 						(
-							/\/images\//.test(file) &&
-							!/\.svg$/.test(file)
+							/\/images\//.test(filepath) &&
+							!/\.svg$/.test(filepath)
 						)
 					);
 				}
 			},
-			/*handler=*/function(monitor) {
+			/*handler=*/function handler(monitor) {
 				monitor.on("created",gzipFile);
 				monitor.on("changed",gzipFile);
 			}
@@ -228,7 +227,7 @@ function preamble() {
 		console.log("*** Building production resources ***");
 	}
 	else {
-		console.log("*** Building debug resources ***");
+		console.log("*** Building dev resources ***");
 	}
 }
 
@@ -244,7 +243,7 @@ function matcher(matching,value) {
 }
 
 function collectionCacheDir(collectionID) {
-	return path.join(DIR_CACHE,
+	return path.join(DIR_TEMPLATES_CACHE,
 		collectionID.replace(/^\//,"").replace(/\//g,"_")
 	);
 }
@@ -419,7 +418,7 @@ function bundleTemplates() {
 
 	// collect js templates into template bundle
 	bundle_str = collectTemplateFiles(
-			/*baseDir=*/DIR_CACHE,
+			/*baseDir=*/DIR_TEMPLATES_CACHE,
 			/*relativeDir=*/"",
 			/*matching=*/[ /^js$/ ],
 			/*readContents=*/true
@@ -503,10 +502,9 @@ function buildLoadJS() {
 		load_data = JSON.parse(
 			fs.readFileSync(FILE_LOADJS_DATA,{ encoding: "utf8" })
 		),
-		collection_id = "/load.js",
-		to_filepath = path.join(DIR_WEB_JS,"load.js");
+		collection_id = "/load.js";
 
-	console.log("Rendering template (" + collection_id + ") to",to_filepath);
+	console.log("Rendering template (" + collection_id + ") to",FILE_LOADJS);
 
 	// set PROD flag
 	load_data.PROD = PROD;
@@ -537,7 +535,7 @@ function buildLoadJS() {
 	contents = grips.render(collection_id + "#main",load_data);
 
 	// write load.js
-	fs.writeFileSync(to_filepath,contents,{ encoding: "utf8", mode: FILE_PERMS });
+	fs.writeFileSync(FILE_LOADJS,contents,{ encoding: "utf8", mode: FILE_PERMS });
 }
 
 function collectFilepaths(dir,matching,notmatching) {
@@ -575,8 +573,8 @@ function collectFilepaths(dir,matching,notmatching) {
 
 function minifyWebJSFiles(filepaths) {
 	filepaths.forEach(function eacher(filepath){
-		var filename = (filepath.match(/\/([^\/]+)$/))[1];
-		var to_filepath = filepath.replace(/\.js$/,".min.js");
+		var filename = (filepath.match(/\/([^\/]+)$/))[1],
+			to_filepath = filepath.replace(/\.js$/,".min.js");
 
 		console.log("Minifying (" + filename + ") to:",to_filepath);
 
